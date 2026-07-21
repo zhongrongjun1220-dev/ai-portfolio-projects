@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+dist/
+*.egg-info/
+*.log
+chatkit*.db
+chatkit*.db-shm
+chatkit*.db-wal
+chatkit_request.txt
+chatkit_response.txt
+run_*.log
+main_*.log
+*.codex_*.ps1
+*.codex_run.*
+.codex_envprobe.ps1
+
+# Node
+node_modules/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Generated artifacts
+resume_final.pdf
+resume_preview.png
+site_b64.txt
+patch.diff
+uploads/*
+!uploads/.gitkeep

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 智能助手</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --panel-alpha: rgba(255,255,255,0.88);
+      --border: #e5e8ef;
+      --text: #141823;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-2: #4f46e5;
+      --danger: #dc2626;
+      --shadow: 0 18px 45px rgba(15,23,42,0.12);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg,#eef2ff,#f5f7fa);
+      color: var(--text);
+    }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .composer { left: 12px; }
+    }
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg,var(--accent),var(--accent-2));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(37,99,235,0.25);
+    }
+    .nav { display: flex; flex-direction: column; gap: 8px; }
+    .nav-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: #ffffff;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+    }
+    .nav-item.active {
+      border-color: var(--border);
+      background: #f9fafb;
+      color: #111827;
+      box-shadow: 0 1px 0 rgba(15,23,42,0.04);
+    }
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      position: relative;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(245,247,250,0.78);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .topbar h1 { margin: 0; font-size: 15px; font-weight: 600; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #374151;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .chip.ok { border-color: #bbf7d0; background: #f0fdf4; color: #14532d; }
+    .chip.warn { border-color: #fde68a; background: #fffbeb; color: #78350f; }
+    .chip.err { border-color: #fecaca; background: #fef2f2; color: #7f1d1d; }
+    .stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 22px 150px;
+    }
+    .welcome { max-width: 640px; text-align: center; }
+    .welcome h2 { margin: 16px 0 10px; font-size: 22px; }
+    .welcome p { margin: 0 auto; color: var(--muted); line-height: 1.7; max-width: 560px; }
+    .suggestions { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .suggestion {
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      max-width: 260px;
+      transition: all .2s ease;
+    }
+    .suggestion:hover { border-color: var(--accent); color: #1d4ed8; transform: translateY(-1px); }
+    .chat {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 0 4px;
+    }
+    .bubble {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      box-shadow: 0 1px 0 rgba(15,23,42,0.04);
+    }
+    .bubble.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg,var(--accent),var(--accent-2));
+      color: #ffffff;
+      border-color: transparent;
+    }
+    .bubble.assistant { align-self: flex-start; background: var(--panel); }
+    .bubble.system {
+      align-self: center;
+      background: var(--panel);
+      color: var(--muted);
+      border-style: dashed;
+      max-width: 520px;
+      text-align: center;
+    }
+    .bubble-row {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bubble-meta { font-size: 12px; color: var(--muted); padding: 0 4px; }
+    .bubble-meta.right { text-align: right; }
+    .composer {
+      position: fixed;
+      bottom: 14px;
+      left: calc(280px + 14px);
+      right: 14px;
+    }
+    .composer-card {
+      max-width: 820px;
+      margin: 0 auto;
+      background: var(--panel-alpha);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+    textarea {
+      width: 100%;
+      min-height: 118px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid #d1d5db;
+      font: inherit;
+      resize: vertical;
+      background: #ffffff;
+      color: var(--text);
+    }
+    textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    .controls {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    button {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      background: #111827;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: transform .05s ease;
+    }
+    button.secondary { background: #ffffff; color: #111827; }
+    button:active { transform: translateY(1px); }
+    button:disabled { opacity: 0.7; cursor: not-allowed; }
+    .typing { display: inline-flex; gap: 5px; padding: 6px 0; }
+    .typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #9ca3af;
+      animation: typing 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes typing {
+      0%, 80%, 100% { transform: translateY(0); opacity: .45; }
+      40% { transform: translateY(-4px); opacity: 1; }
+    }
+    .empty { display: none; }
+    .filled { display: flex; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <div>
+          <div>智能助手</div>
+          <div style="font-weight:500;color:#6b7280;font-size:12px;">实习项目演示</div>
+        </div>
+      </div>
+      <button class="nav-item active" id="newThread">＋ 新建对话</button>
+      <div style="font-size:12px;color:#6b7280;font-weight:600;">近期会话</div>
+      <div class="nav" id="threadList"></div>
+      <div style="margin-top:auto;font-size:12px;color:#9ca3af;line-height:1.6;">
+        基于 FastAPI + ChatKit<br/>流式对话 + 工具调用<br/>兼容 OpenAI 接口模型
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <h1 id="threadTitle">新对话</h1>
+        <div class="chips">
+          <span class="chip" id="statusChip">等待启动</span>
+          <span class="chip" id="modelChip">模型：-</span>
+        </div>
+      </header>
+
+      <section id="emptyState" class="stage">
+        <div class="welcome">
+          <div style="font-size:44px;">🤖</div>
+          <h2>这是可演示的 AI 应用实习项目</h2>
+          <p>后端负责线程管理、流式事件返回、工具调用与模型接入；前端负责把服务端事件渲染成可交互对话界面。你可以直接发送问题，也可以复制接口说明到简历里。</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="你好，我是面试官，请用中文简要说明这个项目的架构、你负责的部分，以及它能帮用户解决什么问题。">说明项目架构与价值</button>
+            <button class="suggestion" data-prompt="帮我做一个今日销售简报，尽量结构化输出，并说明项目中是怎么组织工具调用的。">结构化销售简报</button>
+            <button class="suggestion" data-prompt="生成一份关于大模型应用落地的技术调研提纲，要像能写进简历项目经历里的表述。">技术调研提纲</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="chatState" class="stage empty">
+        <div class="chat" id="chat"></div>
+      </section>
+
+      <div class="composer">
+        <div class="composer-card">
+          <textarea id="message" placeholder="输入消息，试试把示例问题发给助手..."></textarea>
+          <div class="controls">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button id="send">发送并流式展示</button>
+              <button id="stop" class="secondary hidden" type="button">停止生成</button>
+              <button id="copy" class="secondary">复制接口说明</button>
+              <button id="reset" class="secondary">清空对话</button>
+            </div>
+            <div class="meta" id="meta">就绪</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkBackend();
+    });
+
+    const emptyState = document.getElementById('emptyState');
+    const chatState = document.getElementById('chatState');
+    const chat = document.getElementById('chat');
+    const messageEl = document.getElementById('message');
+    const sendEl = document.getElementById('send');
+    const stopEl = document.getElementById('stop');
+    const metaEl = document.getElementById('meta');
+    const statusChip = document.getElementById('statusChip');
+    const modelChip = document.getElementById('modelChip');
+    const threadTitle = document.getElementById('threadTitle');
+    const threadList = document.getElementById('threadList');
+
+    const storageKey = 'chatkit_demo_threads_v1';
+    const historyStorageKey = 'chatkit_demo_thread_history_v1';
+    let currentThreadId = null;
+    let currentThreadKnown = false;
+    let sending = false;
+    let abortController = null;
+
+    async function checkBackend() {
+      try {
+        const res = await fetch('/docs', { method: 'GET' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        setStatus('后端已就绪：http://localhost:8011/', 'ok');
+        const env = await fetch('/__debug_env').then(r => r.json()).catch(() => ({}));
+        setModel('模型：' + (env.openai_default_model || env.default_model || '-'));
+      } catch {
+        setStatus('后端异常', 'err');
+        setModel('模型：-');
+      }
+    }
+
+    function setStatus(text, kind) {
+      statusChip.textContent = text || '就绪';
+      statusChip.className = 'chip ' + (kind === 'error' ? 'err' : kind === 'warn' ? 'warn' : kind === 'ok' ? 'ok' : '');
+    }
+
+    function setModel(text) {
+      modelChip.textContent = text || '模型：-';
+    }
+
+    function threadStore() {
+      try { return JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch { return []; }
+    }
+
+    function saveThreadStore(threads) {
+      try { localStorage.setItem(storageKey, JSON.stringify(threads.slice(0, 20))); } catch {}
+    }
+
+    function threadHistoryStore() {
+      try { return JSON.parse(localStorage.getItem(historyStorageKey) || '{}'); } catch { return {}; }
+    }
+
+    function saveThreadHistoryStore(history) {
+      try { localStorage.setItem(historyStorageKey, JSON.stringify(history)); } catch {}
+    }
+
+    function saveThreadHistory(threadId, messages) {
+      const history = threadHistoryStore();
+      history[threadId] = { messages, updatedAt: new Date().toISOString() };
+      saveThreadHistoryStore(history);
+    }
+
+    function loadThreadHistory(threadId) {
+      return threadHistoryStore()[threadId]?.messages || [];
+    }
+
+    function upsertCurrentThread(title) {
+      const threads = threadStore();
+      const now = new Date().toISOString();
+      if (!currentThreadId) currentThreadId = 'thread-' + Math.random().toString(36).slice(2, 10);
+      const idx = threads.findIndex(item => item.id === currentThreadId);
+      const item = { id: currentThreadId, title: title || '新对话', updatedAt: now };
+      if (item.title && threads[idx]?.title !== item.title) {
+        item.title = title || '新对话';
+      }
+      if (idx >= 0) { threads[idx] = item; } else { threads.unshift(item); }
+      saveThreadStore(threads);
+      renderThreadList();
+      if (title) threadTitle.textContent = title;
+      return currentThreadId;
+    }
+
+    function renderThreadList() {
+      const threads = threadStore();
+      threadList.innerHTML = '';
+      threads.slice(0, 8).forEach(item => {
+        const el = document.createElement('button');
+        el.className = 'nav-item' + (item.id === currentThreadId ? ' active' : '');
+        el.textContent = item.title || '新对话';
+        el.addEventListener('click', () => {
+          currentThreadId = item.id;
+          threadTitle.textContent = item.title || '新对话';
+          renderThreadList();
+          loadThreadItems(item.id).catch(() => {
+            appendSystem('加载会话失败，请稍后重试。');
+          });
+        });
+        threadList.appendChild(el);
+      });
+    }
+
+    async function refreshThreadTitles() {
+      try {
+        const res = await fetch('/chatkit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-ChatKit-User': 'demo-user' },
+          body: JSON.stringify({ type: 'threads.list', params: { limit: 20, order: 'desc' } }),
+        });
+        if (!res.ok) return;
+        const json = await res.json();
+        const threads = (json.data || []).map(t => ({ id: t.id, title: t.title || '新对话', updatedAt: t.created_at || new Date().toISOString() }));
+        const store = threadStore();
+        const changed = threads.some(t => !store.some(s => s.id === t.id));
+        if (!changed && threads.length) return;
+        saveThreadStore(threads.slice(0, 20));
+        renderThreadList();
+      } catch {}
+    }
+
+    async function loadThreadItems(threadId) {
+      currentThreadId = threadId;
+      currentThreadKnown = true;
+      setStatus('加载中', 'warn');
+      metaEl.textContent = '加载会话';
+      let backendItems = [];
+      let title = '新对话';
+      try {
+        const res = await fetch('/chatkit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-ChatKit-User': 'demo-user' },
+          body: JSON.stringify({ type: 'threads.get_by_id', params: { thread_id: threadId } }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          title = json.title || threadTitle.textContent || '新对话';
+          backendItems = (json.items?.data || []).filter(item => item.type === 'user_message' || item.type === 'assistant_message').map(item => ({
+            role: item.type === 'user_message' ? 'user' : 'assistant',
+            text: (item.content || []).map(part => part.text || '').join('').trim(),
+            meta: new Date(item.created_at).toLocaleTimeString(),
+          }));
+        }
+      } catch {}
+
+      const historyItems = loadThreadHistory(threadId).filter(item => item && item.text);
+      const seen = new Set(backendItems.map(item => item.text));
+      const merged = [...backendItems];
+      for (const item of historyItems) {
+        if (!seen.has(item.text)) merged.push(item);
+      }
+      saveThreadHistory(threadId, merged);
+
+      chat.innerHTML = '';
+      emptyState.classList.add('empty');
+      emptyState.classList.remove('filled');
+      chatState.classList.remove('empty');
+      chatState.classList.add('filled');
+      for (const item of merged) {
+        appendBubbleFromHistory(item.text, item.role, item.meta);
+      }
+      threadTitle.textContent = title;
+      setStatus('正常', 'ok');
+      metaEl.textContent = merged.length ? '已加载' : '暂无消息';
+    }
+
+    function appendBubble(text, role, meta) {
+      emptyState.classList.add('empty');
+      emptyState.classList.remove('filled');
+      chatState.classList.remove('empty');
+      chatState.classList.add('filled');
+      const row = document.createElement('div');
+      row.className = 'bubble-row';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble ' + role;
+      bubble.textContent = text;
+      row.appendChild(bubble);
+      if (meta) {
+        const metaEl = document.createElement('div');
+        metaEl.className = 'bubble-meta ' + (role === 'user' ? 'right' : '');
+        metaEl.textContent = meta;
+        row.appendChild(metaEl);
+      }
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+      return bubble;
+    }
+
+    function appendBubbleFromHistory(text, role, meta) {
+      appendBubble(text, role, meta || new Date().toLocaleTimeString());
+    }
+
+    function appendSystem(text) {
+      return appendBubble(text, 'system', new Date().toLocaleTimeString());
+    }
+
+    function showTyping() {
+      emptyState.classList.add('empty');
+      emptyState.classList.remove('filled');
+      chatState.classList.remove('empty');
+      chatState.classList.add('filled');
+      const row = document.createElement('div');
+      row.className = 'bubble-row';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble assistant';
+      bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      row.appendChild(bubble);
+      const meta = document.createElement('div');
+      meta.className = 'bubble-meta';
+      meta.textContent = '正在生成';
+      row.appendChild(meta);
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+      return bubble;
+    }
+
+    async function sendMessage() {
+      const text = messageEl.value.trim();
+      if (!text || sending) return;
+      sending = true;
+      abortController = new AbortController();
+      sendEl.disabled = true;
+      stopEl.classList.remove('hidden');
+      const startedAt = new Date();
+      setStatus('生成中', 'warn');
+      let lastMeta = '流式展示中';
+      if (!currentThreadId || !currentThreadKnown) {
+        upsertCurrentThread(threadTitleFromText(text));
+      }
+      appendBubble(text, 'user', new Date().toLocaleTimeString());
+      saveThreadHistory(currentThreadId || storageKey, [...loadThreadHistory(currentThreadId || storageKey), { role: 'user', text, meta: new Date().toLocaleTimeString() }]);
+      messageEl.value = '';
+      metaEl.textContent = '流式生成中';
+      const assistantBubble = showTyping();
+      assistantBubble.textContent = '';
+
+      const body = (currentThreadId && currentThreadKnown) ? JSON.stringify({
+        type: 'threads.add_user_message',
+        params: {
+          thread_id: currentThreadId,
+          input: {
+            content: [{ type: 'input_text', text }],
+            attachments: [],
+            quoted_text: null,
+            inference_options: {}
+          }
+        }
+      }) : JSON.stringify({
+        type: 'threads.create',
+        params: {
+          input: {
+            content: [{ type: 'input_text', text }],
+            attachments: [],
+            quoted_text: null,
+            inference_options: {}
+          }
+        }
+      });
+
+      try {
+        const res = await fetch('/chatkit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-ChatKit-User': 'demo-user' },
+          body,
+          signal: abortController.signal,
+        });
+
+        if (!res.ok) {
+          setStatus('后端异常', 'err');
+          const text = await res.text();
+          throw new Error('HTTP ' + res.status + '\n' + text);
+        }
+
+        setStatus('后端已就绪：http://localhost:8011/', 'ok');
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        const assistantTextByItem = new Map();
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data:')) continue;
+            const payload = line.slice(5).trim();
+            if (payload === '[DONE]') continue;
+            try {
+              const json = JSON.parse(payload);
+              if (json?.type === 'thread.created') {
+                const previousThreadId = currentThreadId;
+                currentThreadId = json.thread?.id || currentThreadId;
+                currentThreadKnown = true;
+                if (previousThreadId && previousThreadId !== currentThreadId) {
+                  const previousHistory = loadThreadHistory(previousThreadId);
+                  if (previousHistory.length) {
+                    saveThreadHistory(currentThreadId, previousHistory);
+                  }
+                }
+                upsertCurrentThread(threadTitleFromText(text));
+                continue;
+              }
+              if (json?.type === 'thread.item.added' && json?.item?.type === 'assistant_message') {
+                assistantTextByItem.set(json.item.id, '');
+                continue;
+              }
+              if (json?.type === 'thread.item.updated') {
+                const itemId = json.item_id;
+                const update = json.update || json.item?.update;
+                if (!itemId || !update) continue;
+                if (update.type === 'assistant_message.content_part.text_delta') {
+                  const current = assistantTextByItem.get(itemId) || '';
+                  const next = current + (update.delta || '');
+                  assistantTextByItem.set(itemId, next);
+                  assistantBubble.textContent = next || '…';
+                  continue;
+                }
+                if (update.type === 'assistant_message.content_part.added' || update.type === 'assistant_message.content_part.done') {
+                  const text = extractTextFromItem(update.content);
+                  if (text) assistantTextByItem.set(itemId, text);
+                  continue;
+                }
+                if (/^assistant_message/.test(update.type || '')) continue;
+              }
+              if (json?.item?.type === 'assistant_message') {
+                const text = extractTextFromItem(json.item);
+                if (text) assistantTextByItem.set(json.item.id, text);
+              }
+              if (json?.type === 'thread.item.done') {
+                lastMeta = '流式展示完成';
+              }
+            } catch {}
+          }
+        }
+
+        const finalText = assistantBubble.textContent.trim();
+        if (!finalText || finalText === '…') {
+          assistantBubble.textContent = '未收到模型回复，请查看后端日志。';
+          setStatus('异常', 'err');
+          lastMeta = '展示异常';
+        } else {
+          setStatus('正常', 'ok');
+        }
+        saveThreadHistory(currentThreadId || storageKey, [...loadThreadHistory(currentThreadId || storageKey), { role: 'assistant', text: finalText, meta: lastMeta }]);
+        metaEl.textContent = lastMeta;
+      } catch (e) {
+        const aborted = e && e.name === 'AbortError';
+        if (aborted) {
+          assistantBubble.textContent = '已停止生成。';
+          setStatus('已停止', 'warn');
+          lastMeta = '已停止';
+        } else if (e) {
+          assistantBubble.textContent = '请求失败：' + e.message;
+          setStatus('异常', 'err');
+          lastMeta = '请求失败';
+        } else {
+          assistantBubble.textContent = '请求失败。';
+          setStatus('异常', 'err');
+          lastMeta = '请求失败';
+        }
+        saveThreadHistory(currentThreadId || storageKey, [...loadThreadHistory(currentThreadId || storageKey), { role: 'assistant', text: assistantBubble.textContent, meta: lastMeta }]);
+      } finally {
+        sending = false;
+        sendEl.disabled = false;
+        stopEl.classList.add('hidden');
+        if (!lastMeta) {
+          setStatus('就绪', '');
+          metaEl.textContent = '就绪';
+        } else {
+          setStatus(lastMeta === '流式展示完成' || lastMeta === '已停止' ? lastMeta : '异常', lastMeta === '流式展示完成' ? 'ok' : lastMeta === '已停止' ? 'warn' : 'err');
+          metaEl.textContent = lastMeta;
+        }
+        abortController = null;
+      }
+    }
+
+    function stopMessage() {
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
+    }
+
+    function extractTextFromItem(item) {
+      if (!item || !Array.isArray(item.content)) return '';
+      return item.content.map(part => part.text || '').join('');
+    }
+
+    function threadTitleFromText(text) {
+      const trimmed = (text || '').trim();
+      if (!trimmed) return '新对话';
+      const sentences = trimmed.match(/[^\n。！？.!?]+[。！？.!?]*/g) || [trimmed];
+      const title = sentences[0].trim();
+      return title.length > 24 ? title.slice(0, 24) + '…' : title;
+    }
+
+    document.getElementById('send').addEventListener('click', sendMessage);
+    document.getElementById('stop').addEventListener('click', stopMessage);
+    messageEl.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+    document.querySelectorAll('.suggestion').forEach(button => {
+      button.addEventListener('click', () => {
+        messageEl.value = button.dataset.prompt || '';
+        sendMessage();
+      });
+    });
+    document.getElementById('copy').addEventListener('click', async () => {
+      const text = messageEl.value.trim() || '你好，请用中文简要介绍这个项目的价值。';
+      const body = JSON.stringify({
+        type: 'threads.create',
+        params: {
+          input: {
+            content: [{ type: 'input_text', text }],
+            attachments: [],
+            quoted_text: null,
+            inference_options: {}
+          }
+        }
+      }, null, 2);
+      await navigator.clipboard.writeText(body);
+      alert('接口请求体已复制，你可以贴进简历，用于说明项目接口设计与 SSE 流式协议。');
+    });
+    checkBackend();
+    document.getElementById('reset').addEventListener('click', () => {
+      if (!confirm('确定清空当前演示对话吗？')) return;
+      messageEl.value = '';
+      chat.innerHTML = '';
+      metaEl.textContent = '就绪';
+      setStatus('就绪', '');
+      currentThreadId = null;
+      currentThreadKnown = false;
+      threadTitle.textContent = '新对话';
+      renderThreadList();
+      checkBackend();
+    });
+    document.getElementById('newThread').addEventListener('click', () => {
+      if (!confirm('确定新建对话吗？')) return;
+      messageEl.value = '';
+      chat.innerHTML = '';
+      metaEl.textContent = '就绪';
+      setStatus('就绪', '');
+      currentThreadId = null;
+      currentThreadKnown = false;
+      threadTitle.textContent = '新对话';
+      renderThreadList();
+      messageEl.focus();
+      checkBackend();
+    });
+  </script>
+</body>
+</html>
+
+

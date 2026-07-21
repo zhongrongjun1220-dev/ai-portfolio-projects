@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+dist/
+*.egg-info/
+*.log
+*.db
+*.db-shm
+*.db-wal
+
+# Streamlit
+.streamlit/
+
+# Local app data
+courserag/data/
+courserag/exports/
+courserag/storage/
+courserag-backup/data/
+courserag-backup/exports/
+courserag-backup/storage/
+courserag-backup/.gitignore  
+courserag/.gitignore  

@@ -1,0 +1,24 @@
+- generic [ref=f9e2] [box=44,24,960,359]:
+  - generic [ref=f9e3] [box=44,24,960,31]:
+    - generic [ref=f9e4] [box=44,28,167,23]:
+      - strong [ref=f9e5] [box=44,28,83,23]: AI 智能助手
+      - text: 实习项目演示
+    - generic [ref=f9e6] [box=865,24,139,31]:
+      - generic [ref=f9e7] [box=865,24,69,31]: 等待启动
+      - generic [ref=f9e8] [box=942,24,62,31]: 模型：-
+  - generic [ref=f9e9] [box=204,135,640,248]:
+    - generic [ref=f9e10] [box=204,135,640,64]: 🤖
+    - heading "这是可演示的 AI 应用实习项目" [level=2] [ref=f9e11] [box=204,219,640,35]
+    - paragraph [ref=f9e12] [box=204,273,640,47]: 后端负责线程管理、流式事件返回、工具调用与模型接入；前端负责把服务端事件渲染成可交互对话界面。你可以直接发送问题，也可以复制接口说明到简历里。
+    - generic [ref=f9e13] [box=204,342,640,41]:
+      - button "说明项目架构与价值" [ref=f9e14] [cursor=pointer] [box=327,342,146,41]
+      - button "结构化销售简报" [ref=f9e15] [cursor=pointer] [box=483,342,120,41]
+      - button "技术调研提纲" [ref=f9e16] [cursor=pointer] [box=614,342,107,41]
+  - generic [ref=f9e18] [box=99,606,849,234]:
+    - textbox "输入消息，试试把示例问题发给助手..." [ref=f9e19] [box=114,621,849,147]
+    - generic [ref=f9e20] [box=114,785,820,41]:
+      - generic [ref=f9e21] [box=114,785,329,41]:
+        - button "发送并流式展示" [ref=f9e22] [cursor=pointer] [box=114,785,120,41]
+        - button "复制接口说明" [ref=f9e23] [cursor=pointer] [box=244,785,107,41]
+        - button "清空对话" [ref=f9e24] [cursor=pointer] [box=362,785,81,41]
+      - generic [ref=f9e25] [box=902,793,32,23]: 就绪

@@ -1,0 +1,50 @@
+# 个人信息
+name: 钟荣均
+title: AI Developer | LLM Engineer
+phone: 19070249102
+email: zhongrongjun1220@gmail.com
+github: https://github.com/zhongrongjun
+location: 长三角 / 珠三角
+education:
+  - school: 九江学院
+    major: 人工智能（本科）
+    period: 2023.09 - 2027.06
+    notes: 主修数据结构、机器学习、自然语言处理、计算机视觉、Python程序设计
+skills:
+  - Python / C
+  - PyTorch / Transformers
+  - Hugging Face
+  - RAG 架构设计
+  - Agent Workflow 开发
+  - 大模型应用集成
+  - 自动化脚本 / 数据抓取
+projects:
+  - name: AI 多平台智能岗位匹配与自动投递 Agent 系统
+    role: 个人项目
+    period: 近期
+    summary:
+      - 独立设计并开发基于大模型的智能求职自动化平台，实现岗位抓取、智能匹配及自动投递。
+      - 支持 Boss直聘、实习僧、牛客网等多平台岗位统一筛选与管理。
+      - 引入 RAG 与 Agent Workflow，构建可扩展的智能任务协作流程。
+      - 项目成果：日均处理岗位数据 5000+ 条，支持 7 天以上长期 Cookie 保活。
+    images:
+      - cowagent-github.png
+      - nextai-translator.png
+  - name: CourseRAG
+    role: 个人项目
+    period: 2026.07
+    summary:
+      - 基于 RAG 架构实现课程资料智能问答系统，使用 ChromaDB + ONNX MiniLM-L6-v2 构建本地向量库，实现语义级检索与离线可运行。
+      - 支持 PDF / DOCX / PPT / XLS / MD 等多格式资料解析，设计 chunk 级元数据，记录章节、页码、字符位置与 chunk_id，实现引用可追溯。
+      - 开发 Streamlit 交互界面，支持多轮对话、历史持久化保存，以及 Markdown / JSON 导出，具备产品化 demo 雏形。
+      - 优化提示词与推理策略，使模型在资料不完全时也能基于可推断结论作答，提升回答可用性与可解释性。
+    images:
+      - courserag-streamlit.png
+      - local-llm-with-rag-github.png
+awards:
+  - 蓝桥杯程序设计竞赛 省级二等奖
+  - 全国大学生电子设计竞赛 省级二等奖
+strengths:
+  - 专注于 AI Agent 与大模型应用开发，持续学习并实践 LLM、RAG 等前沿技术。
+  - 具备较强的自主学习和独立开发能力，能够快速完成 AI 项目的设计与落地。
+  - 对智能自动化系统、多智能体协作及 AI 工程化应用方向具有浓厚兴趣。

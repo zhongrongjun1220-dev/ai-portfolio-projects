@@ -1,0 +1,25 @@
+- generic [ref=f2e2] [box=364,0,980,870]:
+  - banner [ref=f2e3] [box=384,0,940,153]:
+    - generic [ref=f2e4] [box=408,24,92,25]: 实习项目演示
+    - heading "AI 应用开发项目 - 自研智能助手" [level=1] [ref=f2e5] [box=408,59,892,37]
+    - generic [ref=f2e6] [box=408,109,892,20]: 后端已就绪：http://localhost:8011/
+  - generic [ref=f2e7] [box=384,173,940,143]:
+    - heading "项目说明" [level=2] [ref=f2e8] [box=402,191,903,26]
+    - paragraph [ref=f2e9] [box=402,227,903,47]: 这是一个面向实习岗位的 AI 应用项目：基于 FastAPI 构建后端代理与工具调用，前端通过 fetch 直接调用后端接口，避免依赖不稳定外部 CDN。
+    - paragraph [ref=f2e10] [box=402,274,903,23]: 你可以直接发消息测试流式回复；也可以使用示例请求体，用来向面试官说明项目能力。
+  - generic [ref=f2e11] [box=384,336,940,285]:
+    - heading "演示面板" [level=2] [ref=f2e12] [box=402,355,903,26]
+    - text: 用户输入
+    - textbox "用户输入" [ref=f2e13] [box=402,426,903,120]:
+      - /placeholder: 试试：你好，请用中文简短介绍你自己，并说明你能帮我做什么
+    - generic [ref=f2e14] [box=402,562,903,41]:
+      - button "发送并流式展示" [ref=f2e15] [cursor=pointer] [box=402,562,127,41]
+      - button "填入示例" [ref=f2e16] [cursor=pointer] [box=541,562,87,41]
+      - button "复制请求体到剪贴板" [ref=f2e17] [cursor=pointer] [box=640,562,153,41]
+  - generic [ref=f2e18] [box=384,641,940,189]:
+    - heading "简历/面试可讲点" [level=2] [ref=f2e19] [box=402,660,903,26]
+    - list [ref=f2e20] [box=402,702,903,93]:
+      - listitem [ref=f2e21] [box=442,702,863,23]: 前后端分离的 AI 应用结构：FastAPI + 自定义前端
+      - listitem [ref=f2e22] [box=442,725,863,23]: 流式响应：服务端事件返回，前端实时渲染
+      - listitem [ref=f2e23] [box=442,749,863,23]: 工具调用设计：后端支持上传、天气、销售分析等工具
+      - listitem [ref=f2e24] [box=442,772,863,23]: 工程化细节：CORS、异常处理、SQLite 线程存储、多模态输入处理
